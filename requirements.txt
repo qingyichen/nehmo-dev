@@ -1,0 +1,17 @@
+bpy==4.3.0
+ConfigArgParse==1.4
+cvxpy==1.5.3
+cyipopt==1.5.0
+gym==0.26.2
+imageio==2.33.1
+imageio==2.36.0
+matplotlib==3.10.7
+numpy==2.3.4
+pyrender==0.1.45
+pytorch_kinematics==0.7.5
+scipy==1.16.3
+torch==2.5.1
+tqdm==4.66.5
+trimesh==4.5.2
+urchin==0.0.29
+zonopy_robots.egg==info

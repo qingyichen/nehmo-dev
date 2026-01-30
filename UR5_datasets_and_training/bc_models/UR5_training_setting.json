@@ -1,0 +1,18 @@
+{
+    "seed": 0,
+    "robot": "UR5",
+    "n_links": 12,
+    "dataset_dir": "UR5_datasets_and_training",
+    "data": "UR5_d0.6_mesh_distances_dataset/seed0-79num_data2560000.pkl",
+    "model": "MLP",
+    "num_hidden_layers": 8,
+    "hidden_size": 1024,
+    "softplus_beta": 1,
+    "batch_size": 1024,
+    "lr": 0.0001,
+    "beta1": 0.9,
+    "beta2": 0.999,
+    "num_epochs": 80,
+    "weight_decay": 0.01,
+    "device": "cuda"
+}

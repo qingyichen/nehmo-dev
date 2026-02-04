@@ -1,0 +1,447 @@
+<?xml version="1.0" ?>
+<robot name="ur5_franka">
+ <link name="world_base"/>
+ <joint name="world_to_left" type="fixed">
+        <child link="1base_link" />
+        <parent link="world_base" />
+        <!-- Here you can change the origin of the left arm-->
+        <origin rpy="0 0 0" xyz="0.0 0 0" />
+ </joint>
+  <link name="1base_link">
+    <visual>
+      <geometry>
+        <mesh filename="base.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="base.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="4.0"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072"/>
+    </inertial>
+  </link>
+  <joint name="1shoulder_pan_joint" type="revolute">
+    <parent link="1base_link"/>
+    <child link="1shoulder_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.089159"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="150.0" lower="-6.2831853" upper="6.2831853" velocity="3.15"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1shoulder_link">
+    <visual>
+      <geometry>
+        <mesh filename="shoulder.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="shoulder.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="3.7"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <inertia ixx="0.010267495893" ixy="0.0" ixz="0.0" iyy="0.010267495893" iyz="0.0" izz="0.00666"/>
+    </inertial>
+  </link>
+  <joint name="1shoulder_lift_joint" type="revolute">
+    <parent link="1shoulder_link"/>
+    <child link="1upper_arm_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.13585 0.0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="150.0" lower="-6.2831853" upper="6.2831853" velocity="3.15"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1upper_arm_link">
+    <visual>
+      <geometry>
+        <mesh filename="upperarm.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="upperarm.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="8.393"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.28"/>
+      <inertia ixx="0.22689067591" ixy="0.0" ixz="0.0" iyy="0.22689067591" iyz="0.0" izz="0.0151074"/>
+    </inertial>
+  </link>
+  <joint name="1elbow_joint" type="revolute">
+    <parent link="1upper_arm_link"/>
+    <child link="1forearm_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.1197 0.425"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="150.0" lower="-6.2831853" upper="6.2831853" velocity="3.15"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1forearm_link">
+    <visual>
+      <geometry>
+        <mesh filename="forearm.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="forearm.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.275"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.25"/>
+      <inertia ixx="0.049443313556" ixy="0.0" ixz="0.0" iyy="0.049443313556" iyz="0.0" izz="0.004095"/>
+    </inertial>
+  </link>
+  <joint name="1wrist_1_joint" type="revolute">
+    <parent link="1forearm_link"/>
+    <child link="1wrist_1_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.39225"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="28.0" lower="-6.2831853" upper="6.2831853" velocity="3.2"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1wrist_1_link">
+    <visual>
+      <geometry>
+        <mesh filename="wrist1.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="wrist1.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.219"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <inertia ixx="0.111172755531" ixy="0.0" ixz="0.0" iyy="0.111172755531" iyz="0.0" izz="0.21942"/>
+    </inertial>
+  </link>
+  <joint name="1wrist_2_joint" type="revolute">
+    <parent link="1wrist_1_link"/>
+    <child link="1wrist_2_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.093 0.0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="28.0" lower="-6.2831853" upper="6.2831853" velocity="3.2"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1wrist_2_link">
+    <visual>
+      <geometry>
+        <mesh filename="wrist2.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="wrist2.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.219"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <inertia ixx="0.111172755531" ixy="0.0" ixz="0.0" iyy="0.111172755531" iyz="0.0" izz="0.21942"/>
+    </inertial>
+  </link>
+  <joint name="1wrist_3_joint" type="revolute">
+    <parent link="1wrist_2_link"/>
+    <child link="1wrist_3_link"/>
+    <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.09465"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="28.0" lower="-6.2831853" upper="6.2831853" velocity="3.2"/>
+    <dynamics damping="0.0" friction="0.0"/>
+  </joint>
+  <link name="1wrist_3_link">
+    <visual>
+      <geometry>
+        <mesh filename="wrist3.dae"/>
+      </geometry>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="wrist3.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1879"/>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+      <inertia ixx="0.0171364731454" ixy="0.0" ixz="0.0" iyy="0.0171364731454" iyz="0.0" izz="0.033822"/>
+    </inertial>
+  </link>
+  <joint name="1ee_fixed_joint" type="fixed">
+    <parent link="1wrist_3_link"/>
+    <child link="1ee_link"/>
+    <origin rpy="0.0 0.0 1.570796325" xyz="0.0 0.0823 0.0"/>
+  </joint>
+  <link name="1ee_link">
+    <collision>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="-0.01 0 0"/>
+    </collision>
+  </link>
+
+   <joint name="world_to_right" type="fixed">
+    <child link="kinova_base_link" />
+    <parent link="world_base" />
+    <!-- Here you can change the origin of the right arm -->
+    <origin rpy="0 0 3.14159" xyz="0.6 0 0" />
+ </joint>
+
+
+
+ <link name="kinova_base_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.000648 -0.000166 0.084487"/>
+      <mass value="1.697"/>
+      <inertia ixx="0.004622" ixy="9E-06" ixz="6E-05" iyy="0.004495" iyz="9E-06" izz="0.002079"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="base_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="kinova_shoulder_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-2.3E-05 -0.010364 -0.07336"/>
+      <mass value="1.3773"/>
+      <inertia ixx="0.00457" ixy="1E-06" ixz="2E-06" iyy="0.004831" iyz="0.000448" izz="0.001409"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="shoulder_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="shoulder_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_1" type="continuous">
+    <origin rpy="3.1416 2.7629E-18 -4.9305E-36" xyz="0 0 0.15643"/>
+    <parent link="kinova_base_link"/>
+    <child link="kinova_shoulder_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" velocity="1.3963"/>
+  </joint>
+  <link name="kinova_half_arm_1_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-4.4E-05 -0.09958 -0.013278"/>
+      <mass value="1.1636"/>
+      <inertia ixx="0.011088" ixy="5E-06" ixz="0" iyy="0.001072" iyz="-0.000691" izz="0.011255"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="half_arm_1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="half_arm_1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_2" type="revolute">
+    <origin rpy="1.5708 2.1343E-17 -1.1102E-16" xyz="0 0.005375 -0.12838"/>
+    <parent link="kinova_shoulder_link"/>
+    <child link="kinova_half_arm_1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" lower="-2.41" upper="2.41" velocity="1.3963"/>
+  </joint>
+  <link name="kinova_half_arm_2_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-4.4E-05 -0.006641 -0.117892"/>
+      <mass value="1.1636"/>
+      <inertia ixx="0.010932" ixy="0" ixz="-7E-06" iyy="0.011127" iyz="0.000606" izz="0.001043"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="half_arm_2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="half_arm_2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_3" type="continuous">
+    <origin rpy="-1.5708 1.2326E-32 -2.9122E-16" xyz="0 -0.21038 -0.006375"/>
+    <parent link="kinova_half_arm_1_link"/>
+    <child link="kinova_half_arm_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" velocity="1.3963"/>
+  </joint>
+  <link name="kinova_forearm_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-1.8E-05 -0.075478 -0.015006"/>
+      <mass value="0.9302"/>
+      <inertia ixx="0.008147" ixy="-1E-06" ixz="0" iyy="0.000631" iyz="-0.0005" izz="0.008316"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="forearm_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="forearm_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_4" type="revolute">
+    <origin rpy="1.5708 -6.6954E-17 -1.6653E-16" xyz="0 0.006375 -0.21038"/>
+    <parent link="kinova_half_arm_2_link"/>
+    <child link="kinova_forearm_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="39" lower="-2.66" upper="2.66" velocity="1.3963"/>
+  </joint>
+  <link name="kinova_spherical_wrist_1_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="1E-06 -0.009432 -0.063883"/>
+      <mass value="0.6781"/>
+      <inertia ixx="0.001596" ixy="0" ixz="0" iyy="0.001607" iyz="0.000256" izz="0.000399"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="spherical_wrist_1_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="spherical_wrist_1_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_5" type="continuous">
+    <origin rpy="-1.5708 2.2204E-16 -6.373E-17" xyz="0 -0.20843 -0.006375"/>
+    <parent link="kinova_forearm_link"/>
+    <child link="kinova_spherical_wrist_1_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" velocity="1.2218"/>
+  </joint>
+  <link name="kinova_spherical_wrist_2_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="1E-06 -0.045483 -0.00965"/>
+      <mass value="0.6781"/>
+      <inertia ixx="0.001641" ixy="0" ixz="0" iyy="0.00041" iyz="-0.000278" izz="0.001641"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="spherical_wrist_2_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="spherical_wrist_2_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_6" type="revolute">
+    <origin rpy="1.5708 9.2076E-28 -8.2157E-15" xyz="0 0.00017505 -0.10593"/>
+    <parent link="kinova_spherical_wrist_1_link"/>
+    <child link="kinova_spherical_wrist_2_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" lower="-2.23" upper="2.23" velocity="1.2218"/>
+  </joint>
+  <link name="kinova_bracelet_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.000281 0.011402 -0.029798"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.000587" ixy="3E-06" ixz="3E-06" iyy="0.000369" iyz="-0.000118" izz="0.000609"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="bracelet_no_vision_link.STL"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.75294 0.75294 0.75294 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="bracelet_no_vision_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="kinova_joint_7" type="fixed">
+    <origin rpy="-1.5708 -5.5511E-17 9.6396E-17" xyz="0 -0.10593 -0.00017505"/>
+    <parent link="kinova_spherical_wrist_2_link"/>
+    <child link="kinova_bracelet_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="9" velocity="1.2218"/>
+  </joint>
+
+</robot>

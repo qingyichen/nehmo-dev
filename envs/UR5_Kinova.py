@@ -167,6 +167,7 @@ class DualArmEnv:
         self.pos_lim = np.array(pos_lim).T 
         self.vel_lim = np.array(vel_lim)
         self.eff_lim = np.array(eff_lim) # Unused for now
+
         # vars
         # State variables for the configuration of the URDF robot
         self.state = np.zeros(self.dof*2)
@@ -282,14 +283,14 @@ class DualArmEnv:
             # Try 10 times until there is no self collision
             self.qgoal = self._generate_free_configuration(n_tries=10)
             
-        self.qpos = self.qpos * 0.0 + 0.4
+        self.qpos = self.qpos * 0.0 + 0.15
         self.qgoal = self.qpos.copy()
         self.qgoal *= -1
         # self.qgoal[np.array([0,3,4,7,9,10])] *= -1
         self.qgoal[0] += 3.14
         self.qgoal[1] += 3.14
-        self.qgoal[5] += 3.14
-        self.qgoal[8] += 3.14
+        # self.qgoal[5] += 3.14
+        # self.qgoal[8] += 3.14
         # self.qgoal[2] *= -1
             
     

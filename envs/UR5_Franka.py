@@ -167,6 +167,7 @@ class DualArmEnv:
         self.pos_lim = np.array(pos_lim).T 
         self.vel_lim = np.array(vel_lim)
         self.eff_lim = np.array(eff_lim) # Unused for now
+        
         # vars
         # State variables for the configuration of the URDF robot
         self.state = np.zeros(self.dof*2)
@@ -217,7 +218,6 @@ class DualArmEnv:
                 elif link.name[0] == 'f':
                     self.robot2_collision_manager.add_object(link.name, mesh=mesh)
             self.robot_collision_objs.add(link.name)
-
         # vars
         self.collision_info = None
 
@@ -274,7 +274,7 @@ class DualArmEnv:
             
             # Set the initial velocity to 0 or whatever is provided
             self.qvel = qvel
-            
+                        
         # Generate the goal position
         if qgoal is not None:
             self.qgoal = self._wrap_cont_joints(qgoal)
@@ -282,6 +282,18 @@ class DualArmEnv:
             # Generate a random position for each of the joints
             # Try 10 times until there is no self collision
             self.qgoal = self._generate_free_configuration(n_tries=10)
+            
+        self.qpos = self.qpos * 0.0 + 0.4
+        self.qgoal = self.qpos.copy()
+        self.qgoal *= -1
+        # self.qgoal[np.array([0,3,4,7,9,10])] *= -1
+        self.qgoal[0] += 3.14
+        self.qgoal[1] += 3.14
+        self.qgoal[5] += 3.14
+        self.qgoal[8] += 3.14
+        # self.qgoal[2] *= -1
+            
+    
         self.init_state = np.copy(self.state)
         self.done = False
         self._elapsed_steps = 0
@@ -394,6 +406,7 @@ class DualArmEnv:
             new_pos = self.np_random.uniform(low=pos_lim[0], high=pos_lim[1]) # NOTE: divide by 2 for UR5
             new_pos = self._wrap_cont_joints(new_pos)
             fk_dict = self.robot.link_fk(new_pos, use_names=True)
+
             collision, _ = self._self_collision_check(fk_dict, use_bb=self.use_bb_collision)
             inter_collision, _ = self._different_arm_collision_check(fk_dict, distance=False)
             collision = collision or inter_collision
@@ -1672,7 +1685,7 @@ if __name__ == '__main__':
     env.render()
     for i in range(100):
         qpos = env.qpos
-        velocity_action = np.random.random(12) - 0.5
+        velocity_action = (np.random.random(12) - 0.5) * 0.
         velocity_action = np.tile(velocity_action, timestep_discretization).reshape(timestep_discretization, -1)
         configuration = qpos + np.linspace(0., step_time, num=timestep_discretization ,endpoint=True).reshape(-1,1) * velocity_action
         env.step((configuration, velocity_action))

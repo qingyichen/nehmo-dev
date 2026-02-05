@@ -394,7 +394,7 @@ class DualArmEnv:
         '''
         # to match the config distribution of baseline methods
         pos_lower_lim = np.array([-5, -1.0, 1.0, -0.2, -2.5, -0.0001] + [-np.pi, -2.4, -np.pi, -2.66, -np.pi, -2.23])
-        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] + + [-np.pi, -2.4, -np.pi, -2.66, -np.pi, -2.23])
+        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] + [np.pi, 2.4, np.pi, 2.66, np.pi, 2.23])
         qpos_to_env_mapping = np.array([0, 6, 7, 1, 2, 8, 9, 3, 10, 4, 5, 11], dtype=np.int32)
         pos_lower_lim = pos_lower_lim[qpos_to_env_mapping]
         pos_upper_lim = pos_upper_lim[qpos_to_env_mapping]

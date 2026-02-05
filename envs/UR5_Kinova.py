@@ -283,12 +283,12 @@ class DualArmEnv:
             # Try 10 times until there is no self collision
             self.qgoal = self._generate_free_configuration(n_tries=10)
             
-        self.qpos = self.qpos * 0.0 + 0.15
-        self.qgoal = self.qpos.copy()
-        self.qgoal *= -1
-        # self.qgoal[np.array([0,3,4,7,9,10])] *= -1
-        self.qgoal[0] += 3.14
-        self.qgoal[1] += 3.14
+        # self.qpos = self.qpos * 0.0 + 0.15
+        # self.qgoal = self.qpos.copy()
+        # self.qgoal *= -1
+        # # self.qgoal[np.array([0,3,4,7,9,10])] *= -1
+        # self.qgoal[0] += 3.14
+        # self.qgoal[1] += 3.14
         # self.qgoal[5] += 3.14
         # self.qgoal[8] += 3.14
         # self.qgoal[2] *= -1
@@ -393,8 +393,8 @@ class DualArmEnv:
             RuntimeError: If a free configuration cannot be generated in n_tries attempts.
         '''
         # to match the config distribution of baseline methods
-        pos_lower_lim = np.array([-5, -1.0, 1.0, -0.2, -2.5, -0.0001] * 2)
-        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] * 2)
+        pos_lower_lim = np.array([-5, -1.0, 1.0, -0.2, -2.5, -0.0001] + [-np.pi, -2.4, -np.pi, -2.66, -np.pi, -2.23])
+        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] + + [-np.pi, -2.4, -np.pi, -2.66, -np.pi, -2.23])
         qpos_to_env_mapping = np.array([0, 6, 7, 1, 2, 8, 9, 3, 10, 4, 5, 11], dtype=np.int32)
         pos_lower_lim = pos_lower_lim[qpos_to_env_mapping]
         pos_upper_lim = pos_upper_lim[qpos_to_env_mapping]

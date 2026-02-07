@@ -365,7 +365,8 @@ class DualArmEnv:
         pos_lim = np.copy(self.pos_lim)
         pos_lim[pos_lim == np.Inf] = 2.0 * np.pi 
         pos_lim[pos_lim == -np.Inf] = -2.0 * np.pi
-        pos_lim /= 2.0 # Note: scale the joint range from 2pi to pi. This is peculiar to UR5 robot.
+        pos_lim = pos_lim.clip(-np.pi, np.pi)
+        import pdb;  pdb.set_trace()
         if qpos is None:
             self.qpos = self.np_random.uniform(low=pos_lim[0], high=pos_lim[1])
         else:

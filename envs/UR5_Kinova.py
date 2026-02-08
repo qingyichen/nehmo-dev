@@ -283,15 +283,12 @@ class DualArmEnv:
             # Try 10 times until there is no self collision
             self.qgoal = self._generate_free_configuration(n_tries=10)
             
-        # self.qpos = self.qpos * 0.0 + 0.15
+        # for symmetry plotting
+        # self.qpos = np.array([-2.0, -0.3, 1.0, 0.8, -0.5, 0.0] + [0.15] * 6)
         # self.qgoal = self.qpos.copy()
         # self.qgoal *= -1
-        # # self.qgoal[np.array([0,3,4,7,9,10])] *= -1
         # self.qgoal[0] += 3.14
         # self.qgoal[1] += 3.14
-        # self.qgoal[5] += 3.14
-        # self.qgoal[8] += 3.14
-        # self.qgoal[2] *= -1
             
     
         self.init_state = np.copy(self.state)

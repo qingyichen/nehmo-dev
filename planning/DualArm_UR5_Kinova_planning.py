@@ -17,7 +17,7 @@ from agents.DualArm_agent import DualArmAgent
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--num_links', type=int, default=6)
-    p.add_argument('--robot', type=str, default='UR5')
+    p.add_argument('--robot', type=str, default='UR5_Kinova')
     p.add_argument('--bc_model_dir_path', type=str, default='UR5_datasets_and_training')
 
     p.add_argument('--max_joint_velocity', type=float, default=0.5, required=False, help='Max joint velocity of the arm') # note: this param is dependent on the training setting of HJI

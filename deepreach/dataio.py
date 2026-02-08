@@ -60,12 +60,13 @@ class ReachabilityNNSource(Dataset):
     def __init__(self, numpoints, 
         collisionR=0.0, max_joint_velocity=0.5, num_links=12,
         bc_model=None, device='cpu', pretrain=False, tMin=0.0, tMax=0.6, counter_start=0, counter_end=100e3, 
-        pretrain_iters=2000, num_src_samples=1000, seed=0, use_symmetry=False):
+        pretrain_iters=2000, num_src_samples=1000, seed=0, use_symmetry=False, UR5_kinova=False):
         super().__init__()
         torch.manual_seed(0)
         
         self.bc_model = bc_model.to(device)
         self.device = device
+        self.UR5_kinova = UR5_kinova
 
         self.pretrain = pretrain
         self.numpoints = numpoints
@@ -98,7 +99,15 @@ class ReachabilityNNSource(Dataset):
         start_time = 0.  # time to apply  initial conditions
 
         # uniformly sample domain and include coordinates where source is non-zero 
-        coords = torch.zeros(self.numpoints, self.num_states, device=self.device).uniform_(-1, 1) * torch.pi
+        coords = torch.zeros(self.numpoints, self.num_states, device=self.device).uniform_(-1, 1)
+        if not self.UR5_kinova:
+            coords = coords * torch.pi
+        else:
+            # scale the joint angles according to the UR5 and Kinova joint limits
+            ur5_limits = torch.pi * torch.ones(6, device=self.device)
+            kinova_limits = torch.tensor([np.pi, 2.4, np.pi, 2.66, np.pi, 2.23], device=self.device)
+            limits = torch.cat([ur5_limits, kinova_limits], dim=0)
+            coords = coords * limits[None, :]
         
         if self.pretrain:
             # only sample in time around the initial condition

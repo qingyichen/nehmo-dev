@@ -53,7 +53,7 @@ class DualArmEnv:
             enforce_joint_pos_limit: bool = True,
             verbose_joint_limits: bool = False,
             renderer: RENDERER = 'pyrender',
-            render_frames: int = 30,
+            render_frames: int = 6,
             render_fps: int = 60,
             render_size: Tuple[int, int] = (600, 600),
             render_mesh: bool = True,

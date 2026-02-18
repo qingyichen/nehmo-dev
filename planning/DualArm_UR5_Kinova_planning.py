@@ -14,8 +14,6 @@ from UR5_datasets_and_training.training_utils import make_model
 from envs.UR5_Kinova import DualArmEnv, FullStepRecorder, RobotStepViz
 from agents.DualArm_agent import DualArmAgent
 
-def wrap_joint(configs):
-    return (configs + torch.pi) % (2 * torch.pi) - torch.pi
 
 def parse_args():
     p = argparse.ArgumentParser()
@@ -93,8 +91,8 @@ def compute_plan(planner, qpos, qgoal, step_time=0.1, safe_time=0.3, timestep_di
     env_to_qpos_mapping = np.array([0, 3, 4, 7, 9, 10, 1, 2, 5, 6, 8, 11], dtype=np.int32)
     qpos_to_env_mapping = np.array([0, 6, 7, 1, 2, 8, 9, 3, 10, 4, 5, 11], dtype=np.int32)
     env_qpos = qpos
-    qpos = wrap_joint(env_qpos[env_to_qpos_mapping])
-    qgoal = wrap_joint(qgoal[env_to_qpos_mapping])
+    qpos = env_qpos[env_to_qpos_mapping]
+    qgoal = qgoal[env_to_qpos_mapping]
     
     num_links = qpos.shape[0] // 2
     arm1_state = qpos[:num_links]
@@ -184,7 +182,7 @@ if __name__ == '__main__':
                             step_type='direct',
                             check_self_collision=True,
                             verbose_self_collision=True,
-                            # renderer='pyrender' if not opt.blender else 'blender', # or 'pyrender', or 'blender'
+                            renderer='pyrender-offscreen' if not opt.blender else 'blender', # or 'pyrender', or 'blender'
                             seed=i_trial)
         env.reset()
         if blender:
@@ -221,7 +219,6 @@ if __name__ == '__main__':
                 video_recorder.capture_frame()
             if blender:
                 env.render()
-            env.render()
             success, collision = info['success'], info['collision_info']['in_collision']
             if collision:
                 collision_trials.append(i_trial)
@@ -245,7 +242,6 @@ if __name__ == '__main__':
             video_recorder.close()
         if blender:
             env.close()
-        env.close()
     
     # save statistics
     if opt.save_stats:

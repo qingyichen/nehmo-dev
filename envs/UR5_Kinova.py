@@ -23,6 +23,11 @@ class RENDERER(str, Enum):
     PYRENDER_OFFSCREEN = 'pyrender-offscreen'
     BLENDER = 'blender'
     # MATPLOTLIB = 'matplotlib' # disabled for now
+    
+
+def wrap_joint(configs):
+    return (configs + np.pi) % (2 * np.pi) - np.pi
+    
 
 # A base environment for basic kinematic simulation of any URDF loaded by Urchin without any reward
 class DualArmEnv:
@@ -271,7 +276,6 @@ class DualArmEnv:
                 # Generate a random position for each of the joints
                 # Try 100 times until there is no self collision
                 self.qpos = self._generate_free_configuration(n_tries=100)
-            
             # Set the initial velocity to 0 or whatever is provided
             self.qvel = qvel
                         
@@ -282,6 +286,8 @@ class DualArmEnv:
             # Generate a random position for each of the joints
             # Try 10 times until there is no self collision
             self.qgoal = self._generate_free_configuration(n_tries=10)
+        self.qpos = wrap_joint(self.qpos)
+        self.qgoal = wrap_joint(self.qgoal)
             
         # for symmetry plotting
         # self.qpos = np.array([-2.0, -0.3, 1.0, 0.8, -0.5, 0.0] + [0.15] * 6)
@@ -391,8 +397,8 @@ class DualArmEnv:
             RuntimeError: If a free configuration cannot be generated in n_tries attempts.
         '''
         # to match the config distribution of baseline methods
-        pos_lower_lim = np.array([-5, -1.0, 1.0, -0.2, -2.5, -0.0001] + [-np.pi, -2.4, -np.pi, -2.66, -np.pi, -2.23])
-        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] + [np.pi, 2.4, np.pi, 2.66, np.pi, 2.23])
+        pos_lower_lim = np.array([-5, -1.0, 1.0, -0.2, -2.5, -0.0001] + [-np.pi, -2.0, -np.pi, -2.0, -np.pi, -2.23])
+        pos_upper_lim = np.array([-1.5, 0.5, 2.0, 0.8, -0.5, 0.0] + [np.pi, 2.0, np.pi, 2.0, np.pi, 2.23])
         qpos_to_env_mapping = np.array([0, 6, 7, 1, 2, 8, 9, 3, 10, 4, 5, 11], dtype=np.int32)
         pos_lower_lim = pos_lower_lim[qpos_to_env_mapping]
         pos_upper_lim = pos_upper_lim[qpos_to_env_mapping]
@@ -463,6 +469,7 @@ class DualArmEnv:
         self.last_trajectory = q
         # wraparound the positions for continuous joints (do this after checks becuase checks do different discretizations)
         q = self._wrap_cont_joints(q)
+        q = wrap_joint(q)
         # store the final state
         self.qpos = q[-1]
         self.qvel = qd[-1]
@@ -1685,7 +1692,8 @@ if __name__ == '__main__':
     env.render()
     for i in range(100):
         qpos = env.qpos
-        velocity_action = (np.random.random(12) - 0.5) * 0.
+        velocity_action =  np.array([0.]*12) #(np.random.random(12) - 0.5) * 0.
+        velocity_action[0] = 0.5
         velocity_action = np.tile(velocity_action, timestep_discretization).reshape(timestep_discretization, -1)
         configuration = qpos + np.linspace(0., step_time, num=timestep_discretization ,endpoint=True).reshape(-1,1) * velocity_action
         env.step((configuration, velocity_action))

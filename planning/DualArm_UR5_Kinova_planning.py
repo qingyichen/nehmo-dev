@@ -139,6 +139,10 @@ if __name__ == '__main__':
         planner_name += f'_safeT{opt.safe_time}_b{opt.buffer}'
     planner_name += '_planner'
     
+    # load collision-only initial conditions
+    with open(os.path.join('envs', 'collision_initial_conditions.json'), 'r') as f:
+        collision_initial_conditions = json.load(f)
+    
     # planning statistics
     success_trials = []
     collision_trials = []
@@ -184,7 +188,10 @@ if __name__ == '__main__':
                             verbose_self_collision=True,
                             renderer='pyrender-offscreen' if not opt.blender else 'blender', # or 'pyrender', or 'blender'
                             seed=i_trial)
-        env.reset()
+        env.reset(
+            qpos=collision_initial_conditions[str(i_trial)]['qpos'],
+            qgoal=collision_initial_conditions[str(i_trial)]['qgoal']
+        )
         if blender:
             renderer_args = {'filename': os.path.join(blender_folder, f"{planner_name}_random_scene{i_trial}.blend")}
             env.renderer_kwargs = renderer_args

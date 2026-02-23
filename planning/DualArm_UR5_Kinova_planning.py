@@ -142,6 +142,7 @@ if __name__ == '__main__':
     # load collision-only initial conditions
     with open(os.path.join('envs', 'collision_initial_conditions.json'), 'r') as f:
         collision_initial_conditions = json.load(f)
+    qpos_to_env_mapping = np.array([0, 6, 7, 1, 2, 8, 9, 3, 10, 4, 5, 11], dtype=np.int32)
     
     # planning statistics
     success_trials = []
@@ -189,8 +190,8 @@ if __name__ == '__main__':
                             renderer='pyrender-offscreen' if not opt.blender else 'blender', # or 'pyrender', or 'blender'
                             seed=i_trial)
         env.reset(
-            qpos=collision_initial_conditions[str(i_trial)]['qpos'],
-            qgoal=collision_initial_conditions[str(i_trial)]['qgoal']
+            qpos=np.array(collision_initial_conditions[str(i_trial)]['qpos'])[qpos_to_env_mapping],
+            qgoal=np.array(collision_initial_conditions[str(i_trial)]['qgoal'])[qpos_to_env_mapping]
         )
         if blender:
             renderer_args = {'filename': os.path.join(blender_folder, f"{planner_name}_random_scene{i_trial}.blend")}

@@ -22,7 +22,7 @@ import configargparse
 p = configargparse.ArgumentParser()
 p.add('-c', '--config_filepath', required=False, is_config_file=True, help='Path to config file.')
 
-p.add_argument('--logging_root', type=str, default='./hji_logs/logs_nn_ur5_kinova', help='root for logging')
+p.add_argument('--logging_root', type=str, default='./hji_logs/logs_nn', help='root for logging')
 p.add_argument('--experiment_name', type=str, required=True,
                help='Name of subdirectory in logging_root where summaries and checkpoints will be saved.')
 

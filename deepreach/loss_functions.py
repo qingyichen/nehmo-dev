@@ -193,7 +193,7 @@ def initialize_hji_NN(dataset, minWith, use_symmetry=False):
     max_joint_velocity = dataset.max_joint_velocity
     num_links = dataset.num_links
 
-    def hji_simpleArm(model_output, gt):
+    def hji_nn(model_output, gt):
         source_boundary_values = gt['source_boundary_values']
         x = model_output['model_in']  # (meta_batch_size, num_points, 12)
         y = model_output['model_out']  # (meta_batch_size, num_points, 1)
@@ -226,4 +226,5 @@ def initialize_hji_NN(dataset, minWith, use_symmetry=False):
         return {'dirichlet': torch.abs(dirichlet) * 40,
                 'diff_constraint_hom': torch.abs(diff_constraint_hom)}
     
-    return hji_simpleArm
+
+    return hji_nn

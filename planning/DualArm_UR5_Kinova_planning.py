@@ -35,7 +35,7 @@ def parse_args():
     # planner settings
     p.add_argument('--step_time', type=float, default=0.1, help='The step time of each plan.')
     p.add_argument('--safe_time', type=float, default=0.3, help='The duration of each plan to guarantee safety with HJI solution.')
-    p.add_argument('--planner_mode', type=str, default='hji', help='Planner mode: hji, simple, or adversary.')
+    p.add_argument('--planner_mode', type=str, default='hji', help='Planner mode: hji, simple, or hji_simple.')
     p.add_argument('--buffer', type=float, default=0.05, help='The safety buffer for neural constraints.')
     # planning env settings
     p.add_argument('--num_trials', type=int, default=100, help='The number of random trials.')
@@ -174,7 +174,7 @@ if __name__ == '__main__':
         max_joint_velocity=0.5,
         num_links=6, 
         val_func_model=None if opt.planner_mode=='simple' else load_model(opt=opt),
-        val_func_model2=None if opt.planner_mode=='simple' else load_model(opt=opt, experiment_name="experiment_symmetric_IC_Kinova_seed1"),
+        val_func_model2=None if (opt.planner_mode=='simple' or opt.planner_mode=='hji_simple') else load_model(opt=opt, experiment_name="experiment_symmetric_IC_Kinova_seed1"),
         device=opt.device,
     )
     

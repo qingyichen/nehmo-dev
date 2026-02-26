@@ -121,7 +121,8 @@ def compute_plan(planner, qpos, qgoal, step_time=0.1, safe_time=0.3, timestep_di
                             step_time=step_time, 
                             safe_time=safe_time,
                             buffer=buffer,
-                            planner_mode=arm2_planner_mode).cpu().numpy()
+                            planner_mode=arm2_planner_mode,
+                            arm2=True).cpu().numpy()
     t2 = time.time()
     if arm2_planner_mode == 'hji':
         times.append(t2 - t1)

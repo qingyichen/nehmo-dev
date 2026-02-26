@@ -15,15 +15,17 @@ class DualArmAgent():
                  max_joint_velocity=0.5,
                  num_links=6,
                  val_func_model=None,
+                 val_func_model2=None,
                  verbose=False,
                  device='cpu') -> None:
         self.device = device
         self.max_joint_velocity = max_joint_velocity
         self.model = val_func_model
+        self.model2 = val_func_model2
         self.state_dim = num_links
         self.verbose = verbose
 
-    def plan(self, agent_state, other_agent_state, goal_state, step_time=0.1, safe_time=0.3, buffer=0.0, planner_mode='hji'):
+    def plan(self, agent_state, other_agent_state, goal_state, step_time=0.1, safe_time=0.3, buffer=0.0, planner_mode='hji', arm2=False):
         num_constarints = 1
         if not isinstance(agent_state, torch.Tensor):
             agent_state = torch.tensor(agent_state, device=self.device)
@@ -37,7 +39,7 @@ class DualArmAgent():
             
         # update adversary positions such that each agent will act as if they are adversary
         adversary_positions = other_agent_state
-        adversary_predicted_actions = self.predict_adversary_plans(self_state=agent_state, adversary_agent_state=other_agent_state, time=step_time)
+        adversary_predicted_actions = self.predict_adversary_plans(self_state=agent_state, adversary_agent_state=other_agent_state, time=step_time, arm2=arm2)
         adversary_positions += adversary_predicted_actions.flatten() * step_time
         adversary_positions = wrap_joint(adversary_positions)
         nlp_obj = NNArm_NLP(
@@ -47,9 +49,10 @@ class DualArmAgent():
             max_joint_velocity=self.max_joint_velocity,
             step_time=step_time,
             safe_time=safe_time,
-            val_func_model=self.model,
+            val_func_model=self.model if not arm2 else self.model2,
             device=self.device,
             adversary_positions=adversary_positions,
+            arm2=arm2
         )
 
         nlp = cyipopt.Problem(
@@ -75,17 +78,23 @@ class DualArmAgent():
         if (self.info['status'] != 0): 
             if self.verbose:
                 print(f"Failed to find a solution... using safe plan.")
-            return self.make_safe_plans().flatten()
+            return self.make_safe_plans(arm2=arm2).flatten()
         return torch.tensor(k_opt)
     
-    def predict_adversary_plans(self, self_state, adversary_agent_state, time=0.1):
+    def predict_adversary_plans(self, self_state, adversary_agent_state, time=0.1, arm2=False):
         coords = torch.zeros(1, self.state_dim * 2 + 1, device=self.device)
         coords[:,0] = time
-        coords[:,1:1+self.state_dim] = self_state
-        coords[:,1+self.state_dim:] = adversary_agent_state
+        if not arm2:
+            coords[:,1:1+self.state_dim] = self_state
+            coords[:,1+self.state_dim:] = adversary_agent_state
+        else:
+            coords[:,1:1+self.state_dim] = adversary_agent_state
+            coords[:,1+self.state_dim:] = self_state
         self.currenrt_state_values, self.current_state_grads = self.predict_value_function(coords, compute_grad=True)
-        adversary_plans = -torch.sign(self.current_state_grads[:,1+self.state_dim:]) * self.max_joint_velocity
-        
+        if not arm2:
+            adversary_plans = -torch.sign(self.current_state_grads[:,1+self.state_dim:]) * self.max_joint_velocity
+        else:
+            adversary_plans = -torch.sign(self.current_state_grads[:,1:1+self.state_dim]) * self.max_joint_velocity
         return adversary_plans
     
     def make_simple_plans(self, current_state, goal_state, step_time=0.1):
@@ -96,9 +105,12 @@ class DualArmAgent():
         simple_plan = torch.clamp(diff_state / step_time, min=-self.max_joint_velocity, max=self.max_joint_velocity)
         return simple_plan
     
-    def make_safe_plans(self):
+    def make_safe_plans(self, arm2=False):
         # pick the safeset action according to the value function
-        safe_plan = torch.sign(self.current_state_grads[:,1:1+self.state_dim]) * self.max_joint_velocity
+        if not arm2:
+            safe_plan = torch.sign(self.current_state_grads[:,1:1+self.state_dim]) * self.max_joint_velocity
+        else:
+            safe_plan = torch.sign(self.current_state_grads[:,1+self.state_dim:]) * self.max_joint_velocity
         return safe_plan
     
     def predict_value_function(self, coords=None, compute_grad=False):
@@ -123,7 +135,8 @@ class NNArm_NLP:
                  safe_time=0.5,
                  val_func_model=None,
                  device='cpu',
-                 adversary_positions=None
+                 adversary_positions=None,
+                 arm2=False
                  ):
         if isinstance(start_position, torch.Tensor):
             self.state = start_position.to(device)
@@ -149,6 +162,7 @@ class NNArm_NLP:
         self.safe_time = safe_time
         self.model = val_func_model
         self.device = device
+        self.arm2 = arm2
         self.prev_x = np.zeros_like(self.np_state) * np.nan
         
         self.continuous_joint_flag = np.array([True, True, True, True, True, True]) * False
@@ -184,11 +198,18 @@ class NNArm_NLP:
             # constraint with other agents
             coords = torch.zeros(1, self.num_links * 2 + 1, device=self.device)
             coords[:,0] = self.safe_time
-            coords[:,1:1+self.num_links] = self.state + torch.tensor(x, device=self.device) * self.step_time
-            coords[:,1+self.num_links:] = self.adversary_states
+            if not self.arm2:
+                coords[:,1:1+self.num_links] = self.state + torch.tensor(x, device=self.device) * self.step_time
+                coords[:,1+self.num_links:] = self.adversary_states
+            else:
+                coords[:,1:1+self.num_links] = self.adversary_states
+                coords[:,1+self.num_links:] = self.state + torch.tensor(x, device=self.device) * self.step_time
             model_outputs = self.model({'coords': coords})
             values, inputs = model_outputs['model_out'], model_outputs['model_in']
-            gradient = grad(values, inputs, grad_outputs=torch.ones_like(values))[0][:,1:1+self.num_links] * self.step_time
+            if not self.arm2:
+                gradient = grad(values, inputs, grad_outputs=torch.ones_like(values))[0][:,1:1+self.num_links] * self.step_time
+            else:
+                gradient = grad(values, inputs, grad_outputs=torch.ones_like(values))[0][:,1+self.num_links:] * self.step_time
             symmetry_mask = model_outputs['symmetry_mask']
             if symmetry_mask is not None:
                 gradient[symmetry_mask] *= -1

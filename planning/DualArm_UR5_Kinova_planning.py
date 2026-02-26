@@ -102,6 +102,7 @@ def compute_plan(planner, qpos, qgoal, step_time=0.1, safe_time=0.3, timestep_di
     arm1_goal = qgoal[:num_links]
     arm2_goal = qgoal[num_links:]
     
+    times = []
     t0 = time.time()
     arm1_action = planner.plan(agent_state=arm1_state,
                             other_agent_state=arm2_state,
@@ -112,22 +113,25 @@ def compute_plan(planner, qpos, qgoal, step_time=0.1, safe_time=0.3, timestep_di
                             planner_mode=planner_mode).cpu().numpy()
     
     t1 = time.time()
+    times.append(t1 - t0)
+    arm2_planner_mode = 'simple' if planner_mode == 'hji_simple' else planner_mode
     arm2_action = planner.plan(agent_state=arm2_state,
                             other_agent_state=arm1_state,
                             goal_state=arm2_goal,
                             step_time=step_time, 
                             safe_time=safe_time,
                             buffer=buffer,
-                            planner_mode='simple').cpu().numpy()
+                            planner_mode=arm2_planner_mode).cpu().numpy()
     t2 = time.time()
-    
-    
+    if arm2_planner_mode == 'hji':
+        times.append(t2 - t1)
+        
     velocity_action = np.concatenate((arm1_action, arm2_action))
     new_qpos = qpos.copy() + velocity_action * step_time
     velocity_action = velocity_action[qpos_to_env_mapping]
     velocity_action = np.tile(velocity_action, timestep_discretization).reshape(timestep_discretization, -1)
     configuration = env_qpos + np.linspace(0., step_time, num=timestep_discretization, endpoint=True).reshape(-1,1) * velocity_action
-    return configuration, velocity_action, [t1-t0], qpos, qgoal, new_qpos
+    return configuration, velocity_action, times, qpos, qgoal, new_qpos
     
 
 if __name__ == '__main__':

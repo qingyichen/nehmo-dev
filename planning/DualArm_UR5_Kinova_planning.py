@@ -59,9 +59,11 @@ def load_robot(opt):
     robot = robots2.ZonoArmRobot.load(os.path.join(os.getcwd(), f'envs/arm_urdfs/ur5_kinova/ur5_kinova_gen3.urdf'), create_joint_occupancy=False)
     return robot
     
-def load_model(opt):
+def load_model(opt, experiment_name=None):
     # Setting to plot
-    ckpt_path = f'{opt.logging_root}_{opt.robot}/{opt.experiment_name}/checkpoints/model_final.pth'
+    if experiment_name is None:
+        experiment_name = opt.experiment_name
+    ckpt_path = f'{opt.logging_root}_{opt.robot}/{experiment_name}/checkpoints/model_final.pth'
     activation = 'sine'
     
     # Load the boundary condition model first
@@ -172,6 +174,7 @@ if __name__ == '__main__':
         max_joint_velocity=0.5,
         num_links=6, 
         val_func_model=None if opt.planner_mode=='simple' else load_model(opt=opt),
+        val_func_model2=None if opt.planner_mode=='simple' else load_model(opt=opt, experiment_name="experiment_symmetric_IC_Kinova_seed1"),
         device=opt.device,
     )
     
